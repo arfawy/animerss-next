@@ -1,33 +1,64 @@
-import { getWatchlist, Anime } from "@/lib/api";
+import { getWatchlist, Anime } from "../lib/api";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus } from "lucide-react"; // Icône
+import Link from "next/link";
 
 export default async function Home() {
-  // Appel direct (Server Component)
   let animes: Anime[] = [];
   try {
     animes = await getWatchlist();
   } catch (e) {
     console.error(e);
-    // On garde une liste vide si erreur, ou on affiche un message
   }
 
   return (
-    <main className="min-h-screen bg-gray-950 text-gray-100 p-6">
-      <h1 className="text-3xl font-bold mb-6 text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-purple-500">
-        Nyaa RSS
-      </h1>
+    <main className="min-h-screen bg-background p-4 pb-20">
+      <header className="flex justify-between items-center mb-6 pt-2">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            Mes Animes
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            {animes.length} séries suivies
+          </p>
+        </div>
+        {/* Exemple d'utilisation du Button Shadcn */}
+        <Button asChild size="icon" className="rounded-full h-10 w-10">
+          <Link href="/add">
+            <Plus className="h-5 w-5" />
+          </Link>
+        </Button>
+      </header>
 
       <div className="grid gap-4">
         {animes.length === 0 ? (
-          <p className="text-gray-500 italic">Aucun anime ou erreur de connexion...</p>
+          <div className="text-center py-10">
+            <p className="text-muted-foreground">Aucun anime suivi.</p>
+            <Button asChild variant="outline" className="mt-4">
+              <Link href="/add">Ajouter le premier</Link>
+            </Button>
+          </div>
         ) : (
           animes.map((anime) => (
-            <div 
-              key={anime.id} 
-              className="p-4 bg-gray-900 border border-gray-800 rounded-xl shadow-sm"
-            >
-              <h2 className="font-semibold text-lg">{anime.keyword}</h2>
-              <p className="text-xs text-gray-500 truncate mt-1">{anime.url || "Aucun lien disponible"}</p>
-            </div>
+            <Card key={anime.id} className="overflow-hidden border-border/50">
+              <CardHeader className="p-4 pb-2">
+                <CardTitle className="text-lg leading-none">
+                  {anime.keyword}
+                </CardTitle>
+                <CardDescription className="truncate text-xs mt-1">
+                  {anime.url || "Source inconnue"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 pt-0">
+                {/* On pourra mettre des badges ici plus tard */}
+                <div className="flex gap-2 mt-2">
+                  <div className="text-xs px-2 py-1 rounded bg-secondary text-secondary-foreground">
+                    En cours
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           ))
         )}
       </div>
